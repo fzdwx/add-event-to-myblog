@@ -18,7 +18,7 @@ async function run(): Promise<void> {
         let content = `---
 title: "${issueInfo.title}"
 date: "${issueInfo.createdAt}"
-updated: ${issueInfo.updatedAt}
+updated: "${issueInfo.updatedAt}"
 categories: ${issueInfo.getTagsString()}
 ---
 ${issueInfo.body}`;

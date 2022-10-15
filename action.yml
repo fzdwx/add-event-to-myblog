@@ -8,11 +8,9 @@ inputs:
   token:
     required: true
     description: 'the repo PAT or GITHUB_TOKEN'
-    default: '${{ secrets.TOKEN }}'
   issueNumber:
     required: true
-    description: 'current issue number'
-    default: '${{ github.event.issue.number }}'
+    description: 'current issue number. please use ${{ github.event.issue.number }}'
   username:
     description: 'your git name'
     default: 'fzdwx'

@@ -5,7 +5,7 @@ branding:
   icon: 'archive'
   color: 'black'
 inputs:
-  token: 
+  token:
     required: true
     description: 'the repo PAT or GITHUB_TOKEN'
   username:

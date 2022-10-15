@@ -1,11 +1,25 @@
+// @ts-ignore
 import * as core from '@actions/core'
-import {getArgs} from "./args";
+
+interface UserArgs {
+  token: string,
+  username: string,
+  email: string
+}
 
 async function run(): Promise<void> {
-    let args = getArgs();
-    core.info("mytoken:==============="+args.token)
-    core.info(args.username)
-    core.info(args.username)
+  let args = getArgs();
+  core.info("token============" + args.token);
+  core.info("name===================" + args.username);
+  core.info("email===========" + args.email);
+}
+
+function getArgs(): UserArgs {
+  return {
+    token: core.getInput('token'),
+    username: core.getInput('username'),
+    email: core.getInput('email'),
+  }
 }
 
 run()

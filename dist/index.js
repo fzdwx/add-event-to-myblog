@@ -1,29 +1,6 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 133:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getArgs = void 0;
-const core_1 = __importDefault(__nccwpck_require__(186));
-function getArgs() {
-    return {
-        token: core_1.default.getInput('token'),
-        username: core_1.default.getInput('username'),
-        email: core_1.default.getInput('email'),
-    };
-}
-exports.getArgs = getArgs;
-
-
-/***/ }),
-
 /***/ 109:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -31,11 +8,7 @@ exports.getArgs = getArgs;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -62,15 +35,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+// @ts-ignore
 const core = __importStar(__nccwpck_require__(186));
-const args_1 = __nccwpck_require__(133);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        let args = (0, args_1.getArgs)();
-        core.info("mytoken:===============" + args.token);
-        core.info(args.username);
-        core.info(args.username);
+        let args = getArgs();
+        core.info("token============" + args.token);
+        core.info("name===================" + args.username);
+        core.info("email===========" + args.email);
     });
+}
+function getArgs() {
+    return {
+        token: core.getInput('token'),
+        username: core.getInput('username'),
+        email: core.getInput('email'),
+    };
 }
 run();
 

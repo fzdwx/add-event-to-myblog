@@ -48,10 +48,10 @@ function run() {
             let issueInfo = yield worker.readIssue();
             issueInfo.getTagsString();
             let content = `---
-layout: post
 title: "${issueInfo.title}"
 date: "${issueInfo.createdAt}"
-tags: ${issueInfo.getTagsString()}
+updated: ${issueInfo.updatedAt}
+categories: ${issueInfo.getTagsString()}
 ---
 ${issueInfo.body}`;
             const filepath = `content/notes/${issueInfo.id}.md`;

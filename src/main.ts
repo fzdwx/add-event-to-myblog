@@ -16,10 +16,10 @@ async function run(): Promise<void> {
         let issueInfo = await worker.readIssue();
         issueInfo.getTagsString()
         let content = `---
-layout: post
 title: "${issueInfo.title}"
 date: "${issueInfo.createdAt}"
-tags: ${issueInfo.getTagsString()}
+updated: ${issueInfo.updatedAt}
+categories: ${issueInfo.getTagsString()}
 ---
 ${issueInfo.body}`;
 

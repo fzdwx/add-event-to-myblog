@@ -25,6 +25,9 @@ ${issueInfo.body}`;
 
         const filepath = `content/notes/${issueInfo.id}.md`
 
+        fs.mkdir(`contet/notes`, () => {
+        })
+        
         fs.rm(filepath, () => {
 
             fs.appendFile(filepath, content, () => {

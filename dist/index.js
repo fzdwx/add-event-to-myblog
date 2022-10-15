@@ -103,11 +103,9 @@ class IssueWorker {
                     return item.name;
                 });
             }
-            // @ts-ignore
-            core.info(data.body_text.toString());
+            core.info(JSON.stringify(data.body_text));
             core.info("========================");
-            // @ts-ignore
-            core.info(data.body_html.toString());
+            core.info(JSON.stringify(data.body_html));
             return {
                 getTagsString() {
                     return JSON.stringify(tags);

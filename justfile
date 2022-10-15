@@ -5,4 +5,4 @@ build:
   yarn  build && yarn package
   git add dist
   git commit -a -m "prod dependencies"
-  git push origin releases/v1
+  git push 

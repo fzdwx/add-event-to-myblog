@@ -43,6 +43,7 @@ function run() {
         core.info("token============" + args.token);
         core.info("name===================" + args.username);
         core.info("email===========" + args.email);
+        core.info("issue number ===========" + args.issueNumber);
     });
 }
 function getArgs() {
@@ -50,6 +51,7 @@ function getArgs() {
         token: core.getInput('token'),
         username: core.getInput('username'),
         email: core.getInput('email'),
+        issueNumber: core.getInput("issueNumber")
     };
 }
 run();

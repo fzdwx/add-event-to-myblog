@@ -14,12 +14,12 @@ async function run(): Promise<void> {
         let worker = new IssueWorker(args, github.context)
 
         let issueInfo = await worker.readIssue();
-
+        let issueInfoJson = JSON.parse(JSON.stringify(issueInfo));
         let content = `---
 layout: post
 title: "${issueInfo.title}"
 date: "${issueInfo.createdAt}"
-tags: ${issueInfo.tags.toString()}
+tags: ${issueInfoJson.tags}
 ---
 ${issueInfo.body}`;
 
@@ -31,9 +31,6 @@ ${issueInfo.body}`;
         fs.rm(filepath, () => {
 
             fs.appendFile(filepath, content, async () => {
-                core.info("success save: " + filepath);
-
-                await exec.exec(`cat ${filepath}`)
                 await exec.exec(`git config --global user.email ${args.email}`)
                 await exec.exec(`git config --global user.name ${args.username}`)
                 await exec.exec(`git add ${filepath}`)
@@ -41,7 +38,6 @@ ${issueInfo.body}`;
                 await exec.exec(`git push`)
             })
         })
-
     } catch (err: any) {
         core.setFailed(err.message)
     }
@@ -104,6 +100,10 @@ class IssueWorker {
                 return item.name
             });
         }
+
+        core.info(data.body_text || "")
+        core.info("========================")
+        core.info(data.body_html || "")
 
         return {
             body,

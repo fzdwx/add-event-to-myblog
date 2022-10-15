@@ -46,11 +46,12 @@ function run() {
             let args = getArgs();
             let worker = new IssueWorker(args, github.context);
             let issueInfo = yield worker.readIssue();
+            let issueInfoJson = JSON.parse(JSON.stringify(issueInfo));
             let content = `---
 layout: post
 title: "${issueInfo.title}"
 date: "${issueInfo.createdAt}"
-tags: ${issueInfo.tags.toString()}
+tags: ${issueInfoJson.tags}
 ---
 ${issueInfo.body}`;
             const filepath = `content/notes/${issueInfo.id}.md`;
@@ -58,8 +59,6 @@ ${issueInfo.body}`;
             });
             fs.rm(filepath, () => {
                 fs.appendFile(filepath, content, () => __awaiter(this, void 0, void 0, function* () {
-                    core.info("success save: " + filepath);
-                    yield exec.exec(`cat ${filepath}`);
                     yield exec.exec(`git config --global user.email ${args.email}`);
                     yield exec.exec(`git config --global user.name ${args.username}`);
                     yield exec.exec(`git add ${filepath}`);
@@ -104,6 +103,9 @@ class IssueWorker {
                     return item.name;
                 });
             }
+            core.info(data.body_text || "");
+            core.info("========================");
+            core.info(data.body_html || "");
             return {
                 body,
                 tags,

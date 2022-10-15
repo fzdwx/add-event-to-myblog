@@ -103,15 +103,17 @@ class IssueWorker {
                     return item.name;
                 });
             }
-            core.info(JSON.stringify(data.body_text));
-            core.info("========================");
-            core.info(JSON.stringify(data.body_html));
+            let author = this.owner;
+            if (data.user) {
+                author = data.user.name || this.owner;
+            }
             return {
                 getTagsString() {
                     return JSON.stringify(tags);
                 },
                 body,
                 tags,
+                author: author,
                 title: data.title,
                 createdAt: data.created_at,
                 updatedAt: data.updated_at,

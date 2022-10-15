@@ -55,6 +55,7 @@ interface IssueInfo {
     title: string
     body: string
     tags: string[]
+    author: string
     createdAt: string
     updatedAt: string
 
@@ -103,9 +104,10 @@ class IssueWorker {
             });
         }
 
-        core.info(JSON.stringify(data.body_text))
-        core.info("========================")
-        core.info(JSON.stringify(data.body_html))
+        let author = this.owner;
+        if (data.user) {
+            author = data.user.name || this.owner
+        }
 
         return {
             getTagsString(): string {
@@ -113,6 +115,7 @@ class IssueWorker {
             },
             body,
             tags,
+            author: author,
             title: data.title,
             createdAt: data.created_at,
             updatedAt: data.updated_at,

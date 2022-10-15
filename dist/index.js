@@ -62,6 +62,7 @@ ${issueInfo.body}`;
                     exec.exec(`git config --global user.email ${args.email}`);
                     exec.exec(`git config --global user.name ${args.username}`);
                     exec.exec(`git add ${filepath}`);
+                    exec.exec('rm -f .git/index.lock');
                     exec.exec(`git commit -m notes:${issueInfo.id}-${issueInfo.title} -a `);
                     exec.exec(`git push`);
                 });

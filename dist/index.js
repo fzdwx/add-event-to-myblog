@@ -74,13 +74,14 @@ class IssueWorker {
                 repo,
                 issue_number
             });
-            let body = '';
-            if (data.body != undefined) {
-                body = data.body;
-            }
-            core.info('get issue body' + body);
+            let body = data.body || '';
+            let labels = data.labels.map(item => {
+                // @ts-ignore
+                return item.name;
+            }).join(",");
+            core.info('get issue body\n' + body);
             core.info(data.title);
-            core.info('get lables: ' + data.labels.join(','));
+            core.info('get lables: ' + labels);
         });
     }
 }

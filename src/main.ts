@@ -35,6 +35,7 @@ ${issueInfo.body}`;
 
                 exec.exec(`git config --global user.email ${args.email}`)
                 exec.exec(`git config --global user.name ${args.username}`)
+                exec.exec(`rm -f .git/index.lock`)
                 exec.exec(`git add ${filepath}`)
                 exec.exec(`git commit -m update`)
                 exec.exec(`git push`)

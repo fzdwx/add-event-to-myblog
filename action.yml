@@ -3,7 +3,7 @@ description: 'add event to my blog'
 author: 'fzdwx'
 branding:
   icon: 'archive'
-  color: 'black'
+  color: 'white'
 inputs:
   token:
     required: true

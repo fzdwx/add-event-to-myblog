@@ -38,15 +38,13 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const rest_1 = __nccwpck_require__(5375);
-// @ts-ignore
-const actions_util_1 = __nccwpck_require__(5355);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let args = getArgs();
             let worker = new IssueWorker(args, github.context);
             yield worker.readIssue();
-            core.info(`\n${actions_util_1.THANKS}`);
+            core.info(`\n success`);
         }
         catch (err) {
             core.setFailed(err.message);
@@ -11904,14 +11902,6 @@ function wrappy (fn, cb) {
     return ret
   }
 }
-
-
-/***/ }),
-
-/***/ 5355:
-/***/ ((module) => {
-
-module.exports = eval("require")("actions-util");
 
 
 /***/ }),

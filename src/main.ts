@@ -4,8 +4,6 @@ import {Octokit} from '@octokit/rest'
 
 // @ts-ignore
 import {Context} from '@actions/github/lib/context'
-// @ts-ignore
-import {THANKS} from 'actions-util'
 
 async function run(): Promise<void> {
   try {
@@ -14,7 +12,7 @@ async function run(): Promise<void> {
     let worker = new IssueWorker(args, github.context)
 
     await worker.readIssue()
-    core.info(`\n${THANKS}`)
+    core.info(`\n success`)
   } catch (err: any) {
     core.setFailed(err.message)
   }

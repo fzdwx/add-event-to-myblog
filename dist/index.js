@@ -59,6 +59,7 @@ ${issueInfo.body}`;
             fs.rm(filepath, () => {
                 fs.appendFile(filepath, content, () => {
                     core.info("success save: " + filepath);
+                    exec.exec(`cat ${filepath}`);
                     exec.exec(`git config --global user.email ${args.email}`);
                     exec.exec(`git config --global user.name ${args.username}`);
                     exec.exec(`rm -f .git/index.lock`);

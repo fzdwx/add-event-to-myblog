@@ -15,11 +15,12 @@ async function run(): Promise<void> {
 
         let issueInfo = await worker.readIssue();
         let issueInfoJson = JSON.parse(JSON.stringify(issueInfo));
+        issueInfo.getTagsString()
         let content = `---
 layout: post
 title: "${issueInfo.title}"
 date: "${issueInfo.createdAt}"
-tags: ${issueInfoJson.tags}
+tags: "${issueInfo.getTagsString()}"
 ---
 ${issueInfo.body}`;
 
@@ -57,6 +58,8 @@ interface IssueInfo {
     tags: string[]
     createdAt: string
     updatedAt: string
+
+    getTagsString(): string;
 }
 
 class IssueWorker {
@@ -106,6 +109,9 @@ class IssueWorker {
         core.info(data.body_html || "")
 
         return {
+            getTagsString(): string {
+                return JSON.stringify(tags);
+            },
             body,
             tags,
             title: data.title,

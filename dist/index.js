@@ -47,11 +47,12 @@ function run() {
             let worker = new IssueWorker(args, github.context);
             let issueInfo = yield worker.readIssue();
             let issueInfoJson = JSON.parse(JSON.stringify(issueInfo));
+            issueInfo.getTagsString();
             let content = `---
 layout: post
 title: "${issueInfo.title}"
 date: "${issueInfo.createdAt}"
-tags: ${issueInfoJson.tags}
+tags: "${issueInfo.getTagsString()}"
 ---
 ${issueInfo.body}`;
             const filepath = `content/notes/${issueInfo.id}.md`;
@@ -107,6 +108,9 @@ class IssueWorker {
             core.info("========================");
             core.info(data.body_html || "");
             return {
+                getTagsString() {
+                    return JSON.stringify(tags);
+                },
                 body,
                 tags,
                 title: data.title,

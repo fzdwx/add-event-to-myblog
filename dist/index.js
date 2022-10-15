@@ -46,13 +46,12 @@ function run() {
             let args = getArgs();
             let worker = new IssueWorker(args, github.context);
             let issueInfo = yield worker.readIssue();
-            let issueInfoJson = JSON.parse(JSON.stringify(issueInfo));
             issueInfo.getTagsString();
             let content = `---
 layout: post
 title: "${issueInfo.title}"
 date: "${issueInfo.createdAt}"
-tags: "${issueInfo.getTagsString()}"
+tags: ${issueInfo.getTagsString()}
 ---
 ${issueInfo.body}`;
             const filepath = `content/notes/${issueInfo.id}.md`;
@@ -104,9 +103,11 @@ class IssueWorker {
                     return item.name;
                 });
             }
-            core.info(data.body_text || "");
+            // @ts-ignore
+            core.info(data.body_text.toString());
             core.info("========================");
-            core.info(data.body_html || "");
+            // @ts-ignore
+            core.info(data.body_html.toString());
             return {
                 getTagsString() {
                     return JSON.stringify(tags);

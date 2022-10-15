@@ -14,13 +14,12 @@ async function run(): Promise<void> {
         let worker = new IssueWorker(args, github.context)
 
         let issueInfo = await worker.readIssue();
-        let issueInfoJson = JSON.parse(JSON.stringify(issueInfo));
         issueInfo.getTagsString()
         let content = `---
 layout: post
 title: "${issueInfo.title}"
 date: "${issueInfo.createdAt}"
-tags: "${issueInfo.getTagsString()}"
+tags: ${issueInfo.getTagsString()}
 ---
 ${issueInfo.body}`;
 
@@ -104,9 +103,11 @@ class IssueWorker {
             });
         }
 
-        core.info(data.body_text || "")
+        // @ts-ignore
+        core.info(data.body_text.toString())
         core.info("========================")
-        core.info(data.body_html || "")
+        // @ts-ignore
+        core.info(data.body_html.toString())
 
         return {
             getTagsString(): string {

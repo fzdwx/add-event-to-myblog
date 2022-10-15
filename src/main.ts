@@ -23,7 +23,7 @@ tags: ${issueInfo.tags.toString()}
 ---
 ${issueInfo.body}`;
 
-        const filepath = `content/notes/ ${issueInfo.id}.md`
+        const filepath = `content/notes/${issueInfo.id}.md`
 
         fs.rm(filepath, () => {
 
@@ -33,7 +33,7 @@ ${issueInfo.body}`;
                 exec.exec(`git config --global user.email ${args.email}`)
                 exec.exec(`git config --global user.name ${args.username}`)
                 exec.exec(`git add ${filepath}`)
-                exec.exec(`git commit -m "add notes:${issueInfo.id}-${issueInfo.title}" `)
+                exec.exec(`git commit -m 'add notes:${issueInfo.id}-${issueInfo.title}' `)
                 exec.exec(`git push`)
             })
         })

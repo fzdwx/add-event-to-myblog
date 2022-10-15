@@ -11,7 +11,9 @@ async function run(): Promise<void> {
 
         let worker = new IssueWorker(args, github.context)
 
-        await worker.readIssue()
+        let issueInfo = await worker.readIssue();
+
+        core.info("get issue info :\n" + JSON.stringify(issueInfo))
         core.info(`\n success`)
     } catch (err: any) {
         core.setFailed(err.message)
@@ -23,6 +25,14 @@ interface UserArgs {
     username: string
     email: string
     issueNumber: string
+}
+
+interface IssueInfo {
+    title: string
+    body: string
+    tags: string[]
+    createdAt: string
+    updatedAt: string
 }
 
 class IssueWorker {
@@ -49,7 +59,7 @@ class IssueWorker {
         core.info('Hello ' + login)
     }
 
-    async readIssue() {
+    async readIssue(): Promise<IssueInfo> {
         const {octokit, owner, repo, issue_number} = this
 
         const {data} = await octokit.rest.issues.get({
@@ -58,16 +68,21 @@ class IssueWorker {
             issue_number
         })
 
-        let body = data.body || ''
-        
-        let labels = data.labels.map(item => {
-            // @ts-ignore
-            return item.name
-        }).join(",");
+        let body = data.body || '';
+        let tags: string[] = []
+        if (data.labels != undefined && data.labels.length > 1) {
+            tags = data.labels.map(item => {
+                // @ts-ignore
+                return item.name
+            });
+        }
 
-        core.info('get issue body\n' + body)
-        core.info(data.title)
-        core.info('get lables: ' + labels)
+        let createdAt = data.created_at;
+        let updatedAt = data.updated_at;
+
+        return {
+            body, tags, title: data.title, createdAt, updatedAt
+        }
     }
 }
 

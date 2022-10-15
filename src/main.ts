@@ -1,9 +1,11 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+import * as exec from '@actions/exec'
 import {Octokit} from '@octokit/rest'
 
 // @ts-ignore
 import {Context} from '@actions/github/lib/context'
+import * as fs from "fs";
 
 async function run(): Promise<void> {
     try {
@@ -13,8 +15,32 @@ async function run(): Promise<void> {
 
         let issueInfo = await worker.readIssue();
 
-        core.info("get issue info :\n" + JSON.stringify(issueInfo))
-        core.info(`\n success`)
+        let content = `---
+layout: post
+title: "${issueInfo.title}"
+date: "${issueInfo.createdAt}"
+tags: ${issueInfo.tags.toString()}
+---
+${issueInfo.body}`;
+
+        const filepath = `content/notes/ ${issueInfo.id}.md`
+        fs.stat(filepath, (err, stats) => {
+            if (err) {
+                return
+            }
+
+            fs.rm(filepath, () => {
+                fs.appendFile(filepath, content, () => {
+                    core.info("success save: " + filepath);
+
+                    exec.exec(`git config --global user.email ${args.email}`)
+                    exec.exec(`git config --global user.name ${args.username}`)
+                    exec.exec(`git add ${filepath}`)
+                    exec.exec(`git commit -m "add notes:${issueInfo.id}-${issueInfo.title}" `)
+                    exec.exec(`git push`)
+                })
+            })
+        })
     } catch (err: any) {
         core.setFailed(err.message)
     }
@@ -28,6 +54,7 @@ interface UserArgs {
 }
 
 interface IssueInfo {
+    id: number
     title: string
     body: string
     tags: string[]
@@ -77,11 +104,13 @@ class IssueWorker {
             });
         }
 
-        let createdAt = data.created_at;
-        let updatedAt = data.updated_at;
-
         return {
-            body, tags, title: data.title, createdAt, updatedAt
+            body,
+            tags,
+            title: data.title,
+            createdAt: data.created_at,
+            updatedAt: data.updated_at,
+            id: issue_number
         }
     }
 }

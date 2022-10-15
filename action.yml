@@ -1,11 +1,16 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'add event to my blog'
+description: 'add event to my blog'
+author: 'fzdwx'
 inputs:
-  milliseconds: # change this
+  token: 
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'the repo PAT or GITHUB_TOKEN'
+  username:
+    description: 'your git name'
+    default: 'fzdwx'
+  email:
+    description: 'your git email'
+    default: 'likelovec@gmail.com'
 runs:
   using: 'node16'
   main: 'dist/index.js'

@@ -1,6 +1,8 @@
 name: 'add event to my blog'
 description: 'add event to my blog'
 author: 'fzdwx'
+icon: 'archive'
+color: 'black'
 inputs:
   token: 
     required: true

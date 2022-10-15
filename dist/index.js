@@ -97,7 +97,7 @@ class IssueWorker {
             });
             let body = data.body || '';
             let tags = [];
-            if (data.labels != undefined && data.labels.length > 1) {
+            if (data.labels != undefined && data.labels.length > 0) {
                 tags = data.labels.map(item => {
                     // @ts-ignore
                     return item.name;

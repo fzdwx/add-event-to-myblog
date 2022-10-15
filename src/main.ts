@@ -30,16 +30,15 @@ ${issueInfo.body}`;
 
         fs.rm(filepath, () => {
 
-            fs.appendFile(filepath, content, () => {
+            fs.appendFile(filepath, content, async () => {
                 core.info("success save: " + filepath);
 
-                exec.exec(`cat ${filepath}`)
-                exec.exec(`git config --global user.email ${args.email}`)
-                exec.exec(`git config --global user.name ${args.username}`)
-                exec.exec(`rm -f .git/index.lock`)
-                exec.exec(`git add ${filepath}`)
-                exec.exec(`git commit -m update`)
-                exec.exec(`git push`)
+                await exec.exec(`cat ${filepath}`)
+                await exec.exec(`git config --global user.email ${args.email}`)
+                await exec.exec(`git config --global user.name ${args.username}`)
+                await exec.exec(`git add ${filepath}`)
+                await exec.exec(`git commit -m update-notes`)
+                await exec.exec(`git push`)
             })
         })
 

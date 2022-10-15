@@ -57,16 +57,15 @@ ${issueInfo.body}`;
             fs.mkdir(`content/notes`, () => {
             });
             fs.rm(filepath, () => {
-                fs.appendFile(filepath, content, () => {
+                fs.appendFile(filepath, content, () => __awaiter(this, void 0, void 0, function* () {
                     core.info("success save: " + filepath);
-                    exec.exec(`cat ${filepath}`);
-                    exec.exec(`git config --global user.email ${args.email}`);
-                    exec.exec(`git config --global user.name ${args.username}`);
-                    exec.exec(`rm -f .git/index.lock`);
-                    exec.exec(`git add ${filepath}`);
-                    exec.exec(`git commit -m update`);
-                    exec.exec(`git push`);
-                });
+                    yield exec.exec(`cat ${filepath}`);
+                    yield exec.exec(`git config --global user.email ${args.email}`);
+                    yield exec.exec(`git config --global user.name ${args.username}`);
+                    yield exec.exec(`git add ${filepath}`);
+                    yield exec.exec(`git commit -m update-notes`);
+                    yield exec.exec(`git push`);
+                }));
             });
         }
         catch (err) {

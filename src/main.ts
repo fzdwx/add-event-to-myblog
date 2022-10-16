@@ -74,7 +74,10 @@ class IssueWorker {
         this.repo = ctx.repo.repo
         this.owner = ctx.repo.owner
         this.issue_number = +args.issueNumber
-        this.octokit = new Octokit({auth: `token ${args.token}`})
+        this.octokit = new Octokit({
+            auth: `token ${args.token}`,
+            timeZone:"Asia/Shanghai"
+        })
     }
 
     async test() {

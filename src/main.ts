@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as exec from '@actions/exec'
 import {Octokit} from '@octokit/rest'
+import moment from 'moment'
 
 // @ts-ignore
 import {Context} from '@actions/github/lib/context'
@@ -75,8 +76,7 @@ class IssueWorker {
         this.owner = ctx.repo.owner
         this.issue_number = +args.issueNumber
         this.octokit = new Octokit({
-            auth: `token ${args.token}`,
-            timeZone:"Asia/Shanghai"
+            auth: `token ${args.token}`
         })
     }
 
@@ -112,6 +112,8 @@ class IssueWorker {
             author = data.user.name || this.owner
         }
 
+        const f = "YYYY-MM-DD hh:mm:ss"
+
         return {
             getTagsString(): string {
                 return JSON.stringify(tags);
@@ -120,8 +122,8 @@ class IssueWorker {
             tags,
             author: author,
             title: data.title,
-            createdAt: data.created_at,
-            updatedAt: data.updated_at,
+            createdAt: moment(data.created_at).utcOffset('+08:00').format(f),
+            updatedAt: moment(data.updated_at).utcOffset('+08:00').format(f),
             id: issue_number
         }
     }

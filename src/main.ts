@@ -24,11 +24,8 @@ async function run(): Promise<void> {
 
         fs.mkdir(`content/notes`, emptyCallback)
 
-        fs.rm(filepath, () => {
-            let action = issueInfo.isOpen() ? "add" : "rm";
-            fs.appendFile(filepath, issueToContent(issueInfo), afterAppendFile(args, filepath, action));
-        })
-
+        let action = issueInfo.isOpen() ? "add" : "rm";
+        fs.appendFile(filepath, issueToContent(issueInfo), afterAppendFile(args, filepath, action));
 
     } catch (err: any) {
         core.setFailed(err.message)

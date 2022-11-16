@@ -138,10 +138,8 @@ function run() {
             }
             const filepath = `content/notes/${issueInfo.id}.md`;
             fs.mkdir(`content/notes`, emptyCallback);
-            fs.rm(filepath, () => {
-                let action = issueInfo.isOpen() ? "add" : "rm";
-                fs.appendFile(filepath, (0, issue_1.issueToContent)(issueInfo), afterAppendFile(args, filepath, action));
-            });
+            let action = issueInfo.isOpen() ? "add" : "rm";
+            fs.appendFile(filepath, (0, issue_1.issueToContent)(issueInfo), afterAppendFile(args, filepath, action));
         }
         catch (err) {
             core.setFailed(err.message);

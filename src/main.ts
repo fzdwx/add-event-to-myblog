@@ -10,9 +10,6 @@ import {issueToContent, IssueWorker} from "./issue";
 async function run(): Promise<void> {
     try {
         let args = parseArgs()
-        if (!args.public) {
-            return
-        }
 
         const worker = new IssueWorker(args, github.context)
         const authName = await worker.authName();

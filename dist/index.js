@@ -129,9 +129,6 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let args = parseArgs();
-            if (!args.public) {
-                return;
-            }
             const worker = new issue_1.IssueWorker(args, github.context);
             const authName = yield worker.authName();
             const issueInfo = yield worker.readIssue();

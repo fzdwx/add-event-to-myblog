@@ -49,6 +49,7 @@ function emptyCallback() {
 
 function afterAppendFile(args: UserArgs, filepath: string, action: string) {
     return async function () {
+        fs.truncateSync(filepath)
         await exec.exec(`git config --global user.email ${args.email}`)
         await exec.exec(`git config --global user.name ${args.username}`)
         await exec.exec(`git ${action} ${filepath}`)

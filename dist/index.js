@@ -181,6 +181,7 @@ function emptyCallback() {
 function afterAppendFile(args, filepath, action) {
     return function () {
         return __awaiter(this, void 0, void 0, function* () {
+            fs.truncateSync(filepath);
             yield exec.exec(`git config --global user.email ${args.email}`);
             yield exec.exec(`git config --global user.name ${args.username}`);
             yield exec.exec(`git ${action} ${filepath}`);

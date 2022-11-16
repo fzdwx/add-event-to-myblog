@@ -1,136 +1,66 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as exec from '@actions/exec'
-import {Octokit} from '@octokit/rest'
 
 // @ts-ignore
 import {Context} from '@actions/github/lib/context'
 import * as fs from "fs";
+import {issueToContent, IssueWorker} from "./issue";
 
 async function run(): Promise<void> {
     try {
-        let args = getArgs()
+        let args = parseArgs()
+        if (!args.public) {
+            return
+        }
 
-        let worker = new IssueWorker(args, github.context)
+        const worker = new IssueWorker(args, github.context)
+        const authName = await worker.authName();
+        const issueInfo = await worker.readIssue();
 
-        let issueInfo = await worker.readIssue();
-        issueInfo.getTagsString()
-        let content = `---
-title: "${issueInfo.title}"
-date: "${issueInfo.createdAt}"
-updated: ${issueInfo.updatedAt}
-categories: ${issueInfo.getTagsString()}
----
-${issueInfo.body}`;
+        if (!args.public && authName != issueInfo.author) {
+            core.info(`is not auth user posts! auth: ${authName}, author: ${issueInfo.author} `)
+            return
+        }
 
         const filepath = `content/notes/${issueInfo.id}.md`
 
-        fs.mkdir(`content/notes`, () => {
-        })
+        fs.mkdir(`content/notes`, emptyCallback)
 
         fs.rm(filepath, () => {
-
-            fs.appendFile(filepath, content, async () => {
-                await exec.exec(`git config --global user.email ${args.email}`)
-                await exec.exec(`git config --global user.name ${args.username}`)
-                await exec.exec(`git add ${filepath}`)
-                await exec.exec(`git commit -m update-notes`)
-                await exec.exec(`git push`)
-            })
+            if (issueInfo.isOpen()) {
+                fs.appendFile(filepath, issueToContent(issueInfo), afterAppendFile(args, filepath));
+            }
         })
+
     } catch (err: any) {
         core.setFailed(err.message)
     }
 }
 
-interface UserArgs {
-    token: string
-    username: string
-    email: string
-    issueNumber: string
-}
 
-interface IssueInfo {
-    id: number
-    title: string
-    body: string
-    tags: string[]
-    author: string
-    createdAt: string
-    updatedAt: string
-
-    getTagsString(): string;
-}
-
-class IssueWorker {
-    args: UserArgs
-    octokit: Octokit
-    repo: string
-    owner: string
-    issue_number: number
-
-    constructor(args: UserArgs, ctx: Context) {
-        this.args = args
-        this.repo = ctx.repo.repo
-        this.owner = ctx.repo.owner
-        this.issue_number = +args.issueNumber
-        this.octokit = new Octokit({auth: `token ${args.token}`})
-    }
-
-    async test() {
-        const {octokit} = this
-
-        const {
-            data: {login}
-        } = await octokit.rest.users.getAuthenticated()
-        core.info('Hello ' + login)
-    }
-
-    async readIssue(): Promise<IssueInfo> {
-        const {octokit, owner, repo, issue_number} = this
-
-        const {data} = await octokit.rest.issues.get({
-            owner,
-            repo,
-            issue_number
-        })
-
-        let body = data.body || '';
-        let tags: string[] = []
-        if (data.labels != undefined && data.labels.length > 1) {
-            tags = data.labels.map(item => {
-                // @ts-ignore
-                return item.name
-            });
-        }
-
-        let author = this.owner;
-        if (data.user) {
-            author = data.user.name || this.owner
-        }
-
-        return {
-            getTagsString(): string {
-                return JSON.stringify(tags);
-            },
-            body,
-            tags,
-            author: author,
-            title: data.title,
-            createdAt: data.created_at,
-            updatedAt: data.updated_at,
-            id: issue_number
-        }
-    }
-}
-
-function getArgs(): UserArgs {
+function parseArgs(): UserArgs {
     return {
         token: core.getInput('token'),
         username: core.getInput('username'),
         email: core.getInput('email'),
-        issueNumber: core.getInput('issueNumber')
+        issueNumber: core.getInput('issueNumber'),
+        public: core.getBooleanInput("public")
     }
+}
+
+function emptyCallback() {
+
+}
+
+function afterAppendFile(args: UserArgs, filepath: string) {
+    return async function () {
+        await exec.exec(`git config --global user.email ${args.email}`)
+        await exec.exec(`git config --global user.name ${args.username}`)
+        await exec.exec(`git add ${filepath}`)
+        await exec.exec(`git commit -m update-notes`)
+        await exec.exec(`git push`)
+    };
 }
 
 run()

@@ -8,6 +8,10 @@ inputs:
   token:
     required: true
     description: 'the repo PAT or GITHUB_TOKEN'
+    default: ${{ github.token }}
+  public:
+    default: false
+    description: 'allow other peoples issues to be submitted as notes,default deny'
   issueNumber:
     required: true
     description: 'current issue number.'

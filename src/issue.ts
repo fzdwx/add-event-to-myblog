@@ -1,5 +1,6 @@
 import {Octokit} from "@octokit/rest";
 import {Context} from "@actions/github/lib/context";
+import * as core from '@actions/core'
 
 export class IssueWorker {
     args: UserArgs
@@ -43,6 +44,8 @@ export class IssueWorker {
                 return item.name
             });
         }
+
+        core.info(`tags: ${tags}`)
 
         let author = this.owner;
         if (data.user) {

@@ -1,5 +1,6 @@
 #!/usr/bin/env just --justfile
-#export PATH := "./node_modules/.bin:" + env_var('PATH')
+export PATH := "./node_modules/.bin:" + env_var('PATH')
+#export NODE_OPTIONS := "--openssl-legacy-provider"
 
 build2:
   yarn  build && yarn package

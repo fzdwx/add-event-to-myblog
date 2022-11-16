@@ -25,6 +25,7 @@ async function run(): Promise<void> {
         fs.mkdir(`content/notes`, emptyCallback)
 
         let action = issueInfo.isOpen() ? "add" : "rm --cached -r --";
+        fs.truncateSync(filepath)
         fs.appendFile(filepath, issueToContent(issueInfo), afterAppendFile(args, filepath, action));
 
     } catch (err: any) {
@@ -49,7 +50,6 @@ function emptyCallback() {
 
 function afterAppendFile(args: UserArgs, filepath: string, action: string) {
     return async function () {
-        fs.truncateSync(filepath)
         await exec.exec(`git config --global user.email ${args.email}`)
         await exec.exec(`git config --global user.name ${args.username}`)
         await exec.exec(`git ${action} ${filepath}`)

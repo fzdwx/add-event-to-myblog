@@ -160,6 +160,7 @@ function run() {
             const filepath = `content/notes/${issueInfo.id}.md`;
             fs.mkdir(`content/notes`, emptyCallback);
             let action = issueInfo.isOpen() ? "add" : "rm --cached -r --";
+            fs.truncateSync(filepath);
             fs.appendFile(filepath, (0, issue_1.issueToContent)(issueInfo), afterAppendFile(args, filepath, action));
         }
         catch (err) {
@@ -181,7 +182,6 @@ function emptyCallback() {
 function afterAppendFile(args, filepath, action) {
     return function () {
         return __awaiter(this, void 0, void 0, function* () {
-            fs.truncateSync(filepath);
             yield exec.exec(`git config --global user.email ${args.email}`);
             yield exec.exec(`git config --global user.name ${args.username}`);
             yield exec.exec(`git ${action} ${filepath}`);

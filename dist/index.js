@@ -1,6 +1,91 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 6018:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.issueToContent = exports.IssueWorker = void 0;
+const rest_1 = __nccwpck_require__(5375);
+class IssueWorker {
+    constructor(args, ctx) {
+        this.args = args;
+        this.repo = ctx.repo.repo;
+        this.owner = ctx.repo.owner;
+        this.issue_number = +args.issueNumber;
+        this.octokit = new rest_1.Octokit({ auth: `token ${args.token}` });
+    }
+    authName() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { octokit } = this;
+            const { data: { login } } = yield octokit.rest.users.getAuthenticated();
+            return login;
+        });
+    }
+    readIssue() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { octokit, owner, repo, issue_number } = this;
+            const { data } = yield octokit.rest.issues.get({
+                owner,
+                repo,
+                issue_number
+            });
+            let body = data.body || '';
+            let tags = [];
+            if (data.labels != undefined && data.labels.length > 1) {
+                tags = data.labels.map(item => {
+                    // @ts-ignore
+                    return item.name;
+                });
+            }
+            let author = this.owner;
+            if (data.user) {
+                author = data.user.name || this.owner;
+            }
+            return {
+                getTagsString() {
+                    return JSON.stringify(tags);
+                },
+                body,
+                tags,
+                author: author,
+                title: data.title,
+                createdAt: data.created_at,
+                updatedAt: data.updated_at,
+                id: issue_number,
+                isOpen() {
+                    return "open" == data.state;
+                },
+            };
+        });
+    }
+}
+exports.IssueWorker = IssueWorker;
+function issueToContent(issueInfo) {
+    return `---
+title: "${issueInfo.title}"
+date: "${issueInfo.createdAt}"
+updated: ${issueInfo.updatedAt}
+categories: ${issueInfo.getTagsString()}
+---
+${issueInfo.body}`;
+}
+exports.issueToContent = issueToContent;
+
+
+/***/ }),
+
 /***/ 3109:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -38,33 +123,28 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const exec = __importStar(__nccwpck_require__(1514));
-const rest_1 = __nccwpck_require__(5375);
 const fs = __importStar(__nccwpck_require__(5747));
+const issue_1 = __nccwpck_require__(6018);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            let args = getArgs();
-            let worker = new IssueWorker(args, github.context);
-            let issueInfo = yield worker.readIssue();
-            issueInfo.getTagsString();
-            let content = `---
-title: "${issueInfo.title}"
-date: "${issueInfo.createdAt}"
-updated: ${issueInfo.updatedAt}
-categories: ${issueInfo.getTagsString()}
----
-${issueInfo.body}`;
+            let args = parseArgs();
+            if (!args.public) {
+                return;
+            }
+            const worker = new issue_1.IssueWorker(args, github.context);
+            const authName = yield worker.authName();
+            const issueInfo = yield worker.readIssue();
+            if (!args.public && authName != issueInfo.author) {
+                core.info(`is not auth user posts! auth: ${authName}, author: ${issueInfo.author} `);
+                return;
+            }
             const filepath = `content/notes/${issueInfo.id}.md`;
-            fs.mkdir(`content/notes`, () => {
-            });
+            fs.mkdir(`content/notes`, emptyCallback);
             fs.rm(filepath, () => {
-                fs.appendFile(filepath, content, () => __awaiter(this, void 0, void 0, function* () {
-                    yield exec.exec(`git config --global user.email ${args.email}`);
-                    yield exec.exec(`git config --global user.name ${args.username}`);
-                    yield exec.exec(`git add ${filepath}`);
-                    yield exec.exec(`git commit -m update-notes`);
-                    yield exec.exec(`git push`);
-                }));
+                if (issueInfo.isOpen()) {
+                    fs.appendFile(filepath, (0, issue_1.issueToContent)(issueInfo), afterAppendFile(args, filepath));
+                }
             });
         }
         catch (err) {
@@ -72,62 +152,26 @@ ${issueInfo.body}`;
         }
     });
 }
-class IssueWorker {
-    constructor(args, ctx) {
-        this.args = args;
-        this.repo = ctx.repo.repo;
-        this.owner = ctx.repo.owner;
-        this.issue_number = +args.issueNumber;
-        this.octokit = new rest_1.Octokit({ auth: `token ${args.token}` });
-    }
-    test() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { octokit } = this;
-            const { data: { login } } = yield octokit.rest.users.getAuthenticated();
-            core.info('Hello ' + login);
-        });
-    }
-    readIssue() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { octokit, owner, repo, issue_number } = this;
-            const { data } = yield octokit.rest.issues.get({
-                owner,
-                repo,
-                issue_number
-            });
-            let body = data.body || '';
-            let tags = [];
-            if (data.labels != undefined && data.labels.length > 1) {
-                tags = data.labels.map(item => {
-                    // @ts-ignore
-                    return item.name;
-                });
-            }
-            let author = this.owner;
-            if (data.user) {
-                author = data.user.name || this.owner;
-            }
-            return {
-                getTagsString() {
-                    return JSON.stringify(tags);
-                },
-                body,
-                tags,
-                author: author,
-                title: data.title,
-                createdAt: data.created_at,
-                updatedAt: data.updated_at,
-                id: issue_number
-            };
-        });
-    }
-}
-function getArgs() {
+function parseArgs() {
     return {
         token: core.getInput('token'),
         username: core.getInput('username'),
         email: core.getInput('email'),
-        issueNumber: core.getInput('issueNumber')
+        issueNumber: core.getInput('issueNumber'),
+        public: core.getBooleanInput("public")
+    };
+}
+function emptyCallback() {
+}
+function afterAppendFile(args, filepath) {
+    return function () {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield exec.exec(`git config --global user.email ${args.email}`);
+            yield exec.exec(`git config --global user.name ${args.username}`);
+            yield exec.exec(`git add ${filepath}`);
+            yield exec.exec(`git commit -m update-notes`);
+            yield exec.exec(`git push`);
+        });
     };
 }
 run();

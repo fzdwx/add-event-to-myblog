@@ -138,15 +138,10 @@ function run() {
             }
             const filepath = `content/notes/${issueInfo.id}.md`;
             fs.mkdir(`content/notes`, emptyCallback);
-            yield fs.rm(filepath, () => {
-                if (issueInfo.isOpen()) {
-                    fs.appendFile(filepath, (0, issue_1.issueToContent)(issueInfo), afterAppendFile(filepath));
-                }
+            fs.rm(filepath, () => {
+                let action = issueInfo.isOpen() ? "add" : "rm";
+                fs.appendFile(filepath, (0, issue_1.issueToContent)(issueInfo), afterAppendFile(args, filepath, action));
             });
-            yield exec.exec(`git config --global user.email ${args.email}`);
-            yield exec.exec(`git config --global user.name ${args.username}`);
-            yield exec.exec(`git commit -m update-notes`);
-            yield exec.exec(`git push`);
         }
         catch (err) {
             core.setFailed(err.message);
@@ -164,10 +159,14 @@ function parseArgs() {
 }
 function emptyCallback() {
 }
-function afterAppendFile(filepath) {
+function afterAppendFile(args, filepath, action) {
     return function () {
         return __awaiter(this, void 0, void 0, function* () {
-            yield exec.exec(`git add ${filepath}`);
+            yield exec.exec(`git config --global user.email ${args.email}`);
+            yield exec.exec(`git config --global user.name ${args.username}`);
+            yield exec.exec(`git ${action} ${filepath}`);
+            yield exec.exec(`git commit -m update-notes`);
+            yield exec.exec(`git push`);
         });
     };
 }

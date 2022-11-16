@@ -25,7 +25,11 @@ async function run(): Promise<void> {
         fs.mkdir(`content/notes`, emptyCallback)
 
         let action = issueInfo.isOpen() ? "add" : "rm --cached -r --";
-        fs.truncateSync(filepath)
+
+        if (fs.existsSync(filepath)) {
+            fs.truncateSync(filepath);
+        }
+
         fs.appendFile(filepath, issueToContent(issueInfo), afterAppendFile(args, filepath, action));
 
     } catch (err: any) {

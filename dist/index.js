@@ -160,7 +160,9 @@ function run() {
             const filepath = `content/notes/${issueInfo.id}.md`;
             fs.mkdir(`content/notes`, emptyCallback);
             let action = issueInfo.isOpen() ? "add" : "rm --cached -r --";
-            fs.truncateSync(filepath);
+            if (fs.existsSync(filepath)) {
+                fs.truncateSync(filepath);
+            }
             fs.appendFile(filepath, (0, issue_1.issueToContent)(issueInfo), afterAppendFile(args, filepath, action));
         }
         catch (err) {

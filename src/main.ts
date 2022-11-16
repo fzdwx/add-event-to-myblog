@@ -24,11 +24,16 @@ async function run(): Promise<void> {
 
         fs.mkdir(`content/notes`, emptyCallback)
 
-        fs.rm(filepath, () => {
+        await fs.rm(filepath, () => {
             if (issueInfo.isOpen()) {
-                fs.appendFile(filepath, issueToContent(issueInfo), afterAppendFile(args, filepath));
+                fs.appendFile(filepath, issueToContent(issueInfo), afterAppendFile(filepath));
             }
         })
+
+        await exec.exec(`git config --global user.email ${args.email}`)
+        await exec.exec(`git config --global user.name ${args.username}`)
+        await exec.exec(`git commit -m update-notes`)
+        await exec.exec(`git push`)
 
     } catch (err: any) {
         core.setFailed(err.message)
@@ -50,13 +55,9 @@ function emptyCallback() {
 
 }
 
-function afterAppendFile(args: UserArgs, filepath: string) {
+function afterAppendFile(filepath: string) {
     return async function () {
-        await exec.exec(`git config --global user.email ${args.email}`)
-        await exec.exec(`git config --global user.name ${args.username}`)
         await exec.exec(`git add ${filepath}`)
-        await exec.exec(`git commit -m update-notes`)
-        await exec.exec(`git push`)
     };
 }
 
